@@ -9,15 +9,56 @@ mongoose.connect('mongodb://localhost:27017/TodoApp');
 // #4 Create a mongoose model:
 var Todo = mongoose.model('Todo', {
   text: {
-    type: String
+    type: String,
+    // #1 value must exist
+    required: true,
+    // #2 minimum length of the string
+    minlength: 1,
+    // #3 trim whitespaces
+    trim: true
   },
   completed: {
-    type: Boolean
+    type: Boolean,
+    // #5a smart default
+    default: false
   },
   completedAt: {
-    type: Number
+    type: Number,
+    // #5b
+    default: null
   }
 });
+
+// Challenge - model:
+var User = mongoose.model('User', {
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+  },
+  // password: {
+  //   type: String,
+  //   default: ''
+  // }
+});
+
+// Challenge - object 1:
+var user = new User({
+  email: 'joe@example.com'
+});
+
+// Challenge - object 2:
+// var user = new User({
+
+// });
+
+// Challenge - save the user
+user.save().then((doc) => {
+  console.log(`User saved: ${doc}`);
+}, (err) => {
+  console.log('Unable to save user', err);
+}); 
 
 // #5 Create new Todo object
 var newTodo = new Todo({
@@ -33,13 +74,18 @@ var newTodo = new Todo({
 
 // Challenge result:
 var myTodo = new Todo({
-  text: 'Take a nap',
-  completed: true,
-  completedAt: new Date().getTime()
+  //#2b will not pass - min length is 1.
+  // text: ''
+  // #3b will not pass - will remove emtpy spaces but leaving the empty string:
+  // text: '       '
+  // #4 But if we provide a value with at least one char:
+  text: "     Edit this video     "
+  // completed: true,
+  // completedAt: new Date().getTime()
 });
 
-myTodo.save().then((doc) => {
-  console.log(JSON.stringify(doc, undefined, 2));
-}, (err) => {
-  console.log('Unable to save todo.', err);
-});
+// myTodo.save().then((doc) => {
+//   console.log(JSON.stringify(doc, undefined, 2));
+// }, (err) => {
+//   console.log('Unable to save todo.', err);
+// });
