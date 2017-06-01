@@ -1,4 +1,3 @@
-// #1
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -69,18 +68,14 @@ app.delete('/todos/:id', (req, res) => {
   });
 });
 
-// #2
 app.patch('/todos/:id', (req, res) => {
   var id = req.params.id;
-  // #3 - pick a subset of things that user sent us
   var body = _.pick(req.body, ['text', 'completed']);
 
-  // #4
   if (!ObjectId.isValid(id)) {
     return res.status(404).send();
   }
 
-  // #5
   if (_.isBoolean(body.completed) && body.completed) {
     body.completedAt = new Date().getTime();
   } else {
@@ -88,7 +83,6 @@ app.patch('/todos/:id', (req, res) => {
     body.completedAt = null;
   }
 
-  // #6
   Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
     .then(todo => {
       if (!todo) {
