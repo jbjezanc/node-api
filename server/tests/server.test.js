@@ -11,7 +11,7 @@ const todos = [{
   text: "Second test todo"
 }]; 
 
-// #2
+// #2 Test
 beforeEach((done) => {
   Todo.remove({})
     .then(() => {
