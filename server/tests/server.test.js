@@ -1,12 +1,11 @@
 const expect = require('expect');
 const request = require('supertest');
-// #2b
+
 const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
-// #2a
 const todos = [{
   _id: new ObjectID(),
   text: "First test todo"
@@ -74,7 +73,6 @@ describe('GET /todos', () => {
   });
 });
 
-// #1 
 describe('GET /todos/:id', () => {
   it('should return todo doc', (done) => {
     request(app)
@@ -86,7 +84,6 @@ describe('GET /todos/:id', () => {
       .end(done);
   });
 
-  // Challenge #a
   it('should return 404 if todo not found', (done) => {
       var hexId = new ObjectID().toHexString();
 
@@ -96,7 +93,6 @@ describe('GET /todos/:id', () => {
         .end(done);
     });
 
-    // Challenge #b
     it('should return 404 for non-object ids', (done) => {
       request(app)
         .get('/todos/1234abc')
