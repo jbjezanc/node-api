@@ -1,7 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 
-// Challenge - #c1:
 const {ObjectId} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
@@ -33,25 +32,18 @@ app.get('/todos', (req, res) => {
 });
 
 // #1a GET /todos/1234
- // #1b creates id var on the req object that we can access.
 app.get('/todos/:id', (req, res) => {
-  // res.send(req.params);
   var id = req.params.id;
 
-  // #c2 - Valid id using isValid
   if (!ObjectId.isValid(id)) {
-    // 404 - send back empty send
     return res.status(404).send();
   }
 
-  // findById
   Todo.findById(id).then(todo => {
     if (!todo) {
-      // no todo - send back 404 with empty body
       return res.status(404).send();
     }
-    // success, todo find - send back todo
-    res.status(200).send({todo}); // send todo as a property of an object - that later can be modified
+    res.status(200).send({todo});
   }).catch(e => {
     res.status(400).send();
   });
