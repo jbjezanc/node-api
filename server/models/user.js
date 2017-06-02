@@ -2,6 +2,8 @@ const validator = require('validator');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+// #7
+const bcrypt = require('bcryptjs'); 
 
 
 var UserSchema = new mongoose.Schema({
@@ -78,6 +80,23 @@ UserSchema.statics.findByToken = function(token) {
     'tokens.access': 'auth'
   });
 };
+
+// #5 we need access to 'this' thus the regular function
+UserSchema.pre('save', function (next) {
+  // #6a
+  var user = this;
+  // #6b & Challenge
+  if (user.isModified('password')) {
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, (err, hash) => {
+        user.password = hash;
+        next();
+      });
+    });
+  } else {
+    next(); // the password is not modified, move on with the middleware
+  }
+});
 
 var User = mongoose.model('User', UserSchema);
 
