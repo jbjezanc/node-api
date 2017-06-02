@@ -12,8 +12,6 @@ var {User} = require('./models/user');
 
 var app = express();
 
-// #3
-// const port = process.env.PORT || 3000;
 const port = process.env.PORT;
 
 app.use(bodyParser.json());
@@ -25,6 +23,21 @@ app.post('/todos', (req, res) => {
   todo.save().then((doc) => {
     res.send(doc);
   }, (e) => {
+    res.status(400).send(e);
+  });
+});
+
+app.post('/users', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new User(body);
+
+  // 'this' is looking at the only user variable here
+  user.save().then(() => { // this user is the same object in memory as the var user above
+    // #9
+    return user.generateAuthToken(); // we're expecting a chain of promises, that's why we're returning another promise
+  }).then((token) => {
+    res.header('x-auth', token).send(user); // then  send the user for that token
+  }).catch(e => {
     res.status(400).send(e);
   });
 });
