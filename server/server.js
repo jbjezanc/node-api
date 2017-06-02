@@ -9,6 +9,7 @@ var {mongoose} = require('./db/mongoose');
 
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 
@@ -31,15 +32,39 @@ app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
   var user = new User(body);
 
-  // 'this' is looking at the only user variable here
-  user.save().then(() => { // this user is the same object in memory as the var user above
-    // #9
-    return user.generateAuthToken(); // we're expecting a chain of promises, that's why we're returning another promise
+  user.save().then(() => {
+    return user.generateAuthToken();
   }).then((token) => {
-    res.header('x-auth', token).send(user); // then  send the user for that token
+    res.header('x-auth', token).send(user);
   }).catch(e => {
     res.status(400).send(e);
   });
+});
+
+// #6 the actual route is not gonna run until 'next' is called inside the middleware.
+// THIS FUNCTION IS NOW IN THE authenticate.js
+// var authenticate = (req, res, next) => {
+//   var token = req.header('x-auth');
+
+//                          // #3
+//   User.findByToken(token).then((user) => {
+//     if (!user) {
+//       // #5
+//       return Promise.reject();
+//     }
+
+//     // res.send(user); // instead of sending back the response:
+//     req.user = user;
+//     req.token = token;
+//     next();
+//   }).catch((e) => { // #5
+//     res.status(401).send();
+//   });
+// };
+
+// #1 auth route - requires x-auth token and associated user
+app.get('/users/me', authenticate, (req, res) => { // #6b reference the authenticate middleware
+  res.send(req.user);
 });
 
 app.get('/todos', (req, res) => {

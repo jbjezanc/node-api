@@ -1,13 +1,9 @@
-// #1 
 const validator = require('validator');
 const mongoose = require('mongoose');
-// #6
 const jwt = require('jsonwebtoken');
-// #11
 const _ = require('lodash');
 
 
-// #2 
 var UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -37,7 +33,6 @@ var UserSchema = new mongoose.Schema({
   }]
 });
 
-// #10
 UserSchema.methods.toJSON = function() {
   var user = this;
   var userObject = user.toObject();
@@ -45,10 +40,8 @@ UserSchema.methods.toJSON = function() {
   return _.pick(userObject, ['_id', 'email']);
 };
 
-// #4
 UserSchema.methods.generateAuthToken = function () {
   var user = this;
-  // #5
   var access = 'auth';
   var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
 
@@ -57,13 +50,35 @@ UserSchema.methods.generateAuthToken = function () {
     token
   });
 
-  // # 8 save() returns a Promise / grab the token from the promise
   return user.save().then(() => {
-    return token;           // return the token, the variable defined above
+    return token;
   });   
 };
 
-// #3
+// #2
+UserSchema.statics.findByToken = function(token) {
+  var User = this;
+  var decoded;
+
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch (err) {
+    // #4 - this promise will get returned from findByToken, and rejected
+    // in the server.js at #5.
+    // return new Promise((resolve, reject) => {
+    //   reject();
+    // });
+    return Promise.reject();
+  }
+
+  // success case:
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token, // query nested object properties 
+    'tokens.access': 'auth'
+  });
+};
+
 var User = mongoose.model('User', UserSchema);
 
 module.exports = {User};
