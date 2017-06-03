@@ -171,9 +171,7 @@ describe('PATCH /todos/:id', () => {
   });
 });
 
-// #1
 describe('GET /users/me', () => {
-   // #2a
    it('should return user if authenticated', (done) => {
      request(app)
       .get('/users/me')
@@ -185,7 +183,7 @@ describe('GET /users/me', () => {
       })
       .end(done);
    });
-   // #2b Challenge
+
    it('should return 401 if not authenticated', (done) => {
     request(app)
       .get('/users/me')
@@ -197,9 +195,7 @@ describe('GET /users/me', () => {
    });
 });
 
-// #3a
 describe('POST /users', () => {
-  // #3b
   it('should create a user', (done) => {
     var email = 'example@example.com';
     var password = '123abcd!';
@@ -216,8 +212,6 @@ describe('POST /users', () => {
         expect(res.body._id).toExist();
         expect(res.body.email).toBe(email);
       })
-      // .end(done);
-      // #3c
       .end(err => {
         if (err) {
           return done(err);
@@ -225,12 +219,12 @@ describe('POST /users', () => {
 
         User.findOne({email}).then(user => {
           expect(user).toExist();
-          expect(user.password).toNotBe(password); // if 'equal' passwords are not getting hashed
+          expect(user.password).toNotBe(password);
           done();
         });
       });
   });
-  // #3d
+
   it('should return validation errors if request invalid', (done) => {
     var email = 'exampleexample.com';
     var password = '123';
@@ -240,12 +234,12 @@ describe('POST /users', () => {
       .expect(400)
       .end(done);
   });
-  // #3e
+
   it('should not create user if email in use', (done) => {
     request(app)
       .post('/users')
       .send({
-        email: users[0].email, // already taken
+        email: users[0].email,
         password: 'somevalidpassword123'
       })
       .expect(400)

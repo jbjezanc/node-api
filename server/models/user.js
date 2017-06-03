@@ -41,6 +41,32 @@ UserSchema.methods.toJSON = function() {
   return _.pick(userObject, ['_id', 'email']);
 };
 
+// #2b
+UserSchema.statics.findByCredentials = function (email, password) {
+  var User = this;
+
+  return User.findOne({email}).then(user => {
+    if (!user) {
+      return Promise.reject();
+    }
+
+    // wrap bcrpyt.compare with a promise since bcrypt only works 
+    // with callbacks
+    return new Promise((resolve, reject) => {
+      // use bcrypt.compare to compare password and user.password
+      bcrypt.compare(password, user.password, (err, res) => {
+        // call resolve if user is found in findOne
+        if (res) { // if the response is true, go ahead and resolve this promise:
+          resolve(user); // resolve the promise with user - available in then() in the call
+        } else {
+          // call reject if user is not found in findOne - sends 400 in the call
+          return reject();
+        }
+      });
+    });
+  });
+};
+
 UserSchema.methods.generateAuthToken = function () {
   var user = this;
   var access = 'auth';
@@ -56,7 +82,6 @@ UserSchema.methods.generateAuthToken = function () {
   });   
 };
 
-// #2
 UserSchema.statics.findByToken = function(token) {
   var User = this;
   var decoded;
