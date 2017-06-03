@@ -45,25 +45,16 @@ app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
 
-// #1 POST /users/login (email, password)
 app.post('/users/login', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
 
-    // res.send(body);
-    // #2a verify user email exists
-    // call the method first, then figure out what you want to implement at definition
-    // we want: pass in email, password and get a user back - then create a new token for the user
     User.findByCredentials(body.email, body.password).then(user => {
-      // #3
-      // res.send(user);
       return user.generateAuthToken().then(token => {
-        // respond with header attached to response
         res.header('x-auth', token).send(user);
       });
     }).catch(e => {
       res.status(400).send();
-    }); // we didn't find the user
-
+    });
 });
 
 app.get('/todos', (req, res) => {
