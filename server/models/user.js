@@ -2,7 +2,6 @@ const validator = require('validator');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
-// #7
 const bcrypt = require('bcryptjs'); 
 
 
@@ -65,27 +64,22 @@ UserSchema.statics.findByToken = function(token) {
   try {
     decoded = jwt.verify(token, 'abc123');
   } catch (err) {
-    // #4 - this promise will get returned from findByToken, and rejected
-    // in the server.js at #5.
     // return new Promise((resolve, reject) => {
     //   reject();
     // });
     return Promise.reject();
   }
 
-  // success case:
   return User.findOne({
     '_id': decoded._id,
-    'tokens.token': token, // query nested object properties 
+    'tokens.token': token,
     'tokens.access': 'auth'
   });
 };
 
-// #5 we need access to 'this' thus the regular function
 UserSchema.pre('save', function (next) {
-  // #6a
   var user = this;
-  // #6b & Challenge
+
   if (user.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(user.password, salt, (err, hash) => {
@@ -94,7 +88,7 @@ UserSchema.pre('save', function (next) {
       });
     });
   } else {
-    next(); // the password is not modified, move on with the middleware
+    next();
   }
 });
 

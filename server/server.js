@@ -41,15 +41,12 @@ app.post('/users', (req, res) => {
   });
 });
 
-// #6 the actual route is not gonna run until 'next' is called inside the middleware.
 // THIS FUNCTION IS NOW IN THE authenticate.js
 // var authenticate = (req, res, next) => {
 //   var token = req.header('x-auth');
 
-//                          // #3
 //   User.findByToken(token).then((user) => {
 //     if (!user) {
-//       // #5
 //       return Promise.reject();
 //     }
 
@@ -57,13 +54,12 @@ app.post('/users', (req, res) => {
 //     req.user = user;
 //     req.token = token;
 //     next();
-//   }).catch((e) => { // #5
+//   }).catch((e) => {
 //     res.status(401).send();
 //   });
 // };
 
-// #1 auth route - requires x-auth token and associated user
-app.get('/users/me', authenticate, (req, res) => { // #6b reference the authenticate middleware
+app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
 
