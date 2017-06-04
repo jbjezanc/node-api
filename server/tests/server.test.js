@@ -130,7 +130,6 @@ describe('DELETE /todos/:id', () => {
       .end(done);
   });
 });
-
 describe('PATCH /todos/:id', () => {
   it('should update the todo', (done) => {
     var hexId = todos[0]._id.toHexString();
@@ -221,7 +220,7 @@ describe('POST /users', () => {
           expect(user).toExist();
           expect(user.password).toNotBe(password);
           done();
-        }).catch(err => done(err)); // #2 gives back the exact err message
+        }).catch(err => done(err));
       });
   });
 
@@ -247,9 +246,7 @@ describe('POST /users', () => {
   });
 });
 
-// #1
 describe('POST /users/login', () => {
-  // #1a
   it('should login user and return x-auth token', (done) => {
     request(app)
       .post('/users/login')
@@ -268,14 +265,14 @@ describe('POST /users/login', () => {
 
         User.findById(users[1]._id).then(user => {
           expect(user.tokens[0]).toInclude({
-            access: 'auth', // #2 change this value for a test
+            access: 'auth',
             token: res.headers['x-auth']
           });
           done();
         }).catch(err => done(err));
       });
   });
-  // #1b
+
   it('should reject invalid login', (done) => {
     request(app)
       .post('/users/login')
