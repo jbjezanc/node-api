@@ -75,7 +75,6 @@ UserSchema.methods.generateAuthToken = function () {
   });   
 };
 
-// #3
 UserSchema.methods.removeToken = function (token) {
   var user = this;
 
